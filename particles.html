@@ -1,0 +1,87 @@
+<html>
+
+<style>
+    body {
+        background-color: white;
+    }
+
+    canvas {
+        background-color: black;
+    }
+</style>
+
+<body onload="init();">
+    <canvas id="demoCanvas" width="1900" height="930"></canvas>
+
+    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+
+    <script>
+        var stage = new createjs.Stage("demoCanvas");
+        var circles = [];
+
+        const RADIUS = 5;
+        const WIDTH = 1900;
+        const HEIGHT = 900;
+        const COLORS = ['blue', 'red', 'yellow', 'green', 'aqua'];
+        const BORDER = RADIUS;
+
+        const direction = () => randomInt(2) == 1 ? -1 : 1;
+        var color = () => COLORS[randomInt(COLORS.length)];
+
+        function randomInt(max) {
+            return Math.floor(Math.random() * Math.floor(max));
+        }
+
+        function init() {
+            for (var i = 0; i < 100; i++) {
+                var graphics = new createjs.Graphics().beginFill(color()).drawCircle(0, 0, RADIUS);
+                var circle = new createjs.Shape(graphics);
+
+                circles[i] = circle;
+                circle.xrate = 1 + (direction() * randomInt(RADIUS));
+                circle.yrate = 1 + (direction() * randomInt(RADIUS));
+                circle.x = randomInt(WIDTH);
+                circle.y = randomInt(HEIGHT);
+
+                stage.addChild(circle);
+            }
+
+            createjs.Ticker.setFPS(50);
+            createjs.Ticker.on("tick", moveParticle);
+        }
+
+        function moveParticle(event) {
+            for (var i = 0; i < circles.length; i++) {
+                circles[i].y += circles[i].yrate;
+                if (circles[i].yrate >= 0) {
+                    if (circles[i].y >= HEIGHT - BORDER) {
+                        circles[i].y = HEIGHT - BORDER;
+                        circles[i].yrate *= -1;
+                    }
+                } else {
+                    if (circles[i].y <= BORDER) {
+                        circles[i].y = BORDER;
+                        circles[i].yrate *= -1;
+                    }
+                }
+
+                circles[i].x += circles[i].xrate;
+                if (circles[i].xrate >= 0) {
+                    if (circles[i].x >= WIDTH - BORDER) {
+                        circles[i].x = WIDTH - BORDER;
+                        circles[i].xrate *= -1;
+                    }
+                } else {
+                    if (circles[i].x <= BORDER) {
+                        circles[i].x = BORDER;
+                        circles[i].xrate *= -1;
+                    }
+                }
+            }
+
+            stage.update();
+        }
+    </script>
+</body>
+
+</html>
