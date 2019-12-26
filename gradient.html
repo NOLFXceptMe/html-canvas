@@ -9,7 +9,7 @@
         margin-left: 50px;
     }
 
-    div {
+    div.canvas {
         background-color: black;
         color: white;
         width: 1000px;
@@ -27,57 +27,26 @@
 <body>
     <h1> Rectangle gradient fill from Red to Blue varying alpha from 1 to 0</h1>
 
-    <h2> Create a canvas </h2>
-    <pre>
-        <code>
-        const width = 1000;
-        const height = 300;
-
-        const canvas = document.getElementById('canvas');
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        </code>
-    </pre>
+    <div id='canvas-bg-color-radio'>
+        <h3>Canvas background color</h3>
+        <input type="radio" name="canvas-bg-color" value="black" checked> Black <br>
+        <input type="radio" name="canvas-bg-color" value="white"> White <br>
+    </div>
 
     <h2> Using built-in linear gradient </h2>
-    <pre>
-    <code>
-        var gradient = ctx.createLinearGradient(0, 0, height, width);
-        gradient.addColorStop(0, 'rgba(255,0,0,1)');
-        gradient.addColorStop(1, 'rgba(0,0,255,0)');
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
-    </code>
-    </pre>
-    <div id="canvas1">
+    <div class='canvas' id="canvas1">
         <canvas id="linear"></canvas>
     </div>
 
     <h2> Using arithmetic mean gradient </h2>
-    <pre>
-    <code>
-        for (var row = 0; row < height; row ++) {
-            for (var col = 0; col < width; col ++) {
-                var measure = (row / height + col / width) / 2;
-
-                var red = parseInt((1 - measure) * 255);
-                var blue = parseInt(measure * 255);
-                var alpha = 1 - measure;
-
-                ctx.fillStyle = 'rgba(' + red + ',0,' + blue + ',' + alpha + ')';
-                ctx.fillRect(col, row, 1, 1);
-            }
-        }
-    </code>
-    </pre>
-    <div id="canvas2">
+    <div class='canvas' id="canvas2">
         <canvas id="manual"></canvas>
     </div>
 
     <script>
+        var bgColorRadio = document.getElementsByName('canvas-bg-color').forEach(ele => ele.onchange = switchbgcolor);
+
         const width = 1000;
         const height = 300;
 
@@ -113,7 +82,15 @@
             }
         }
 
+        function switchbgcolor() {
+            const div1 = document.getElementById('canvas1');
+            div1.style.backgroundColor = div1.style.backgroundColor == 'white' ? 'black' : 'white';
+
+            const div2 = document.getElementById('canvas2');
+            div2.style.backgroundColor = div2.style.backgroundColor == 'white' ? 'black' : 'white';
+        }
     </script>
+
     </body<>
 
 </html>
