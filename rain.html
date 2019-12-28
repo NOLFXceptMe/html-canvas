@@ -1,0 +1,85 @@
+<html>
+
+<style>
+    body {
+        background-color: white;
+    }
+
+    canvas {
+        background-color: black;
+    }
+</style>
+
+<body onload="init();">
+    <canvas id="demoCanvas"></canvas>
+
+    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+
+    <script>
+        const canvas = document.getElementById("demoCanvas");
+        var width = canvas.width = window.innerWidth;
+        var height = canvas.height = window.innerHeight;
+        console.log("width:" + canvas.width);
+        console.log("height:" + canvas.height);
+
+        var stage = new createjs.Stage(canvas);
+        var drops = [];
+
+        const BUFFER = 100;
+        const MIN_LENGTH = 10, MAX_LENGTH = 30;
+
+        const randomInt = max => Math.floor(Math.random() * Math.floor(max));
+        const randomRange = (min, max) => min + randomInt(max - min);
+
+        function init() {
+            for (var i = 0; i < 300; i++) {
+                var drop = new createjs.Shape();
+                drop.graphics.setStrokeStyle(1);
+                drops[i] = drop;
+                initDrop(drop);
+
+                stage.addChild(drop);
+            }
+
+            createjs.Ticker.framerate = 25;
+            createjs.Ticker.on("tick", moveAndRenderDrop);
+        }
+
+        function initDrop(drop) {
+            drop.x = randomRange(0, width);
+            drop.y = randomRange(0, height);
+
+            drop.vx = 5;
+            drop.vy = 25;
+
+            drop.normalizer = Math.sqrt(drop.vx ** 2 + drop.vy ** 2);
+            drop.length = randomRange(MIN_LENGTH, MAX_LENGTH);
+        }
+
+        const updateDrop = drop => {
+            drop.x = drop.x + drop.vx;
+            drop.y = drop.y + drop.vy;
+
+            if (drop.x > width || drop.y > height) {
+                initDrop(drop);
+            }
+
+            var dx = drop.vx * drop.length / drop.normalizer;
+            var dy = drop.vy * drop.length / drop.normalizer;
+
+            var opacity = 1 - (drop.y * 1.0 / height);
+            drop.graphics.beginStroke('rgba(255, 255, 255,' + opacity + ')').moveTo(0, 0).lineTo(dx, dy).endStroke();
+        }
+
+        function moveAndRenderDrop(event) {
+            drops.forEach(updateDrop);
+
+            stage.update();
+        }
+
+    </script>
+
+
+</body>
+
+</html>
