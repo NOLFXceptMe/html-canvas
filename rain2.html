@@ -1,0 +1,100 @@
+<html>
+
+<style>
+    body {
+        background-color: white;
+    }
+
+    canvas {
+        background-color: black;
+    }
+</style>
+
+<body onload="init();">
+    <canvas id="demoCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("demoCanvas");
+        var width = canvas.width = window.innerWidth;
+        var height = canvas.height = window.innerHeight;
+        console.log("width:" + canvas.width);
+        console.log("height:" + canvas.height);
+
+        var drops = [];
+
+        const ctx = canvas.getContext("2d");
+        const BUFFER = 100;
+        const MIN_LENGTH = 10, MAX_LENGTH = 30;
+        const FPS = 30;
+        const NDROPS = 400;
+
+        const randomInt = max => Math.floor(Math.random() * Math.floor(max));
+        const randomRange = (min, max) => min + randomInt(max - min);
+
+        function clearStrage() {
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        function init() {
+            for (var i = 0; i < NDROPS; i++) {
+                var drop = {};
+                drops[i] = drop;
+                initDrop(drop);
+            }
+
+            render();
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function render()  {
+            clearStrage();
+
+            drops.forEach(updateDrop);
+            drops.forEach(drawDrop);
+
+            await sleep(1000/FPS);
+            requestAnimationFrame(render);
+        }
+
+        function drawDrop(drop) {
+            ctx.beginPath();
+
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x + drop.dx, drop.y + drop.dy);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgb(255, 255, 255)";
+
+            ctx.stroke();
+        }
+
+        function initDrop(drop) {
+            drop.x = randomRange(0, width);
+            drop.y = randomRange(0, height);
+
+            drop.vx = 5;
+            drop.vy = 25;
+
+            drop.normalizer = Math.sqrt(drop.vx ** 2 + drop.vy ** 2);
+            drop.length = randomRange(MIN_LENGTH, MAX_LENGTH);
+        }
+
+        const updateDrop = drop => {
+            drop.x = drop.x + drop.vx;
+            drop.y = drop.y + drop.vy;
+
+            if (drop.x > width || drop.y > height) {
+                initDrop(drop);
+            }
+
+            drop.dx = drop.vx * drop.length / drop.normalizer;
+            drop.dy = drop.vy * drop.length / drop.normalizer;
+        }
+
+    </script>
+</body>
+</html>
