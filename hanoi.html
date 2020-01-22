@@ -1,0 +1,150 @@
+<html>
+<style>
+    body {
+        background-color: white;
+    }
+
+    canvas {
+        background-color: black;
+    }
+</style>
+
+<body onload="init()" ;>
+    <canvas id="hanoi"></canvas>
+
+    <script>
+        const canvas = document.getElementById("hanoi");
+        var width = canvas.width = window.innerWidth;
+        var height = canvas.height = window.innerHeight;
+        console.log("width:" + canvas.width);
+        console.log("height:" + canvas.height);
+
+        const ctx = canvas.getContext('2d');
+        const COLORS = ['red', 'blue', 'green'];
+        const T_HEIGHT = 400, T_WIDTH = 10;
+        const LEFT_BORDER = 200;
+        const BOT_BORDER = 200;
+        const N_DISKS = 10;
+        const DISK_HEIGHT = 20;
+        const towers = [{}, {}, {}];
+        const disks = [];
+        const gameplay = [];
+        var game = [];
+        var moves = 0;
+        var isMove;
+
+        function clearStage() {
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = "#FFFFFF";
+            ctx.font = "30px Arial";
+            ctx.fillText("Number of disks: " + N_DISKS, 100, 100);
+            ctx.fillText("Moves: " + moves, 100, 150);
+        }
+
+        function init() {
+            setupDisks();
+            setupTowers();
+            addDisks(towers[0]);
+
+            game.push(function () { play(towers[0], towers[2], towers[1], N_DISKS); });
+            render();
+        }
+
+        function play(from, to, buffer, n) {
+            if (n == 1) {
+                game.push(function () { move(from, to); });
+            } else {
+                game.push(function () { play(buffer, to, from, n - 1); });
+                game.push(function () { move(from, to); });
+                game.push(function () { play(from, buffer, to, n - 1); });
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function render() {
+            clearStage();
+            drawTowers();
+
+            if (game.length != 0) {
+                var currentMove = game.pop();
+                currentMove();
+                if (isMove) {
+                    await sleep(500);
+                    isMove = false;
+                }
+                requestAnimationFrame(render);
+            }
+        }
+
+        function setupDisks() {
+            [...Array(N_DISKS).keys()].forEach(i => {
+                disk = {};
+                disk.index = i;
+                disk.width = (i + 1) * 20;
+
+                disks[i] = disk;
+            });
+        }
+
+        function setupTowers() {
+            towers.forEach((tower, i) => {
+                tower.index = i;
+                tower.x = LEFT_BORDER + 400 * i;
+                tower.y = height - BOT_BORDER;
+                tower.color = COLORS[i];
+                tower.disks = [];
+            });
+        }
+
+        function addDisk(tower, disk) {
+            console.log("Adding disk " + disk.index + " to tower " + tower.index)
+            var nDisksOnTower = tower.disks.length;
+
+            if (nDisksOnTower == 0 || disk.index < tower.disks[nDisksOnTower - 1].index) {
+                tower.disks.push(disk);
+            } else {
+                alert("Illegal move. Cannot place disk " + disk.index);
+            };
+        }
+
+        function addDisks(tower) {
+            for (var i = N_DISKS - 1; i >= 0; i--) {
+                addDisk(tower, disks[i]);
+            }
+        }
+
+        function drawTowers() {
+            towers.forEach((tower, i) => {
+                ctx.fillStyle = tower.color;
+                ctx.fillRect(tower.x, tower.y, T_WIDTH, -T_HEIGHT);
+
+                var nDisks = tower.disks.length;
+                for (var i = 0; i < nDisks; i++) {
+                    var disk = tower.disks[i];
+                    ctx.fillStyle = 'rgba(128, 128, 128)';
+                    ctx.fillRect(tower.x - disk.width / 2, tower.y - i * (DISK_HEIGHT + 1),
+                        disk.width + T_WIDTH, -DISK_HEIGHT);
+                }
+            });
+        }
+
+        function move(tower1, tower2) {
+            isMove = true;
+            moves++;
+            console.log("Move a disk from tower " + tower1.index + " to " + tower2.index);
+            var nDisksOnTower1 = tower1.disks.length;
+            var disk = tower1.disks[tower1.disks.length - 1];
+
+            addDisk(tower2, disk);
+            tower1.disks.length = nDisksOnTower1 - 1;
+        }
+
+    </script>
+</body>
+
+</html>
