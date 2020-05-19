@@ -1,0 +1,65 @@
+<html>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.dom.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <script>
+      let font;
+function preload() {
+    font = loadFont('https://s3.amazonaws.com/frontend.web2pdf/ITC+Avant+Garde+Gothic+LT+Demi+Regular.otf');
+}
+
+function setup() {
+  createCanvas(800, 400);
+} 
+
+function draw() { 
+  background(220);
+  drawRect();
+  drawLogo();
+}
+
+function drawLogo() {  
+  push();
+  textFont(font);
+  textSize(100);
+  textAlign(CENTER, CENTER);
+  text('adidas', 400, 190);
+  pop();
+}
+
+function drawRect() {
+  let width = textWidth('adidas');
+  fill(0);
+  
+  push();
+  strokeWeight(40);
+  translate(300, 160);
+  rotate(radians(-30));
+  rect(0, 0, 20, 150);
+  translate(76, -10);
+  rect(0, 0, 20, 150);
+  translate(80, -10);
+  rect(0, 0, 20, 150);
+  pop();
+  
+  push();
+  noStroke();
+  fill(220);
+  rect(200, 170, 400, 400);
+  pop();
+}
+  </script>
+</body>
+
+</html>
